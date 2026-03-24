@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_club"
+        android:icon="@drawable/ic_club"
+        android:title="俱乐部" />
+    <item
+        android:id="@+id/navigation_play"
+        android:icon="@drawable/ic_play"
+        android:title="玩车" />
+    <item
+        android:id="@+id/navigation_watch"
+        android:icon="@drawable/ic_watch"
+        android:title="看车" />
+    <item
+        android:id="@+id/navigation_message"
+        android:icon="@drawable/ic_message"
+        android:title="消息" />
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="我的" />
+</menu>
