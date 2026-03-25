@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 
 open class BaseViewModel : ViewModel() {
 
-    /** 统一协程异常处理，子类可覆盖 */
+    /** 统一协程异常处理，子类可覆盖  */
     protected val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         onError(throwable)
     }
