@@ -25,4 +25,5 @@ class PlayFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }
