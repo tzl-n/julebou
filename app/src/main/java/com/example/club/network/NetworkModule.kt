@@ -1,6 +1,8 @@
 package com.example.club.network
 
+import com.example.club.BuildConfig
 import com.example.club.network.api.ApiConstants
+import com.example.club.network.interceptor.HttpHeaderInterceptor
 import com.example.club.network.service.*
 import dagger.Module
 import dagger.Provides
@@ -22,22 +24,27 @@ object NetworkModule {
     @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG)
+                HttpLoggingInterceptor.Level.BODY
+            else
+                HttpLoggingInterceptor.Level.HEADERS
         }
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(logging: HttpLoggingInterceptor): OkHttpClient =
+    fun provideOkHttpClient(
+        headerInterceptor: HttpHeaderInterceptor,
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient =
         OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(logging)
+            .addInterceptor(headerInterceptor)
+            .addInterceptor(loggingInterceptor)
             .build()
 
-    @Provides
-    @Singleton
-    @Named("main")
+    @Provides @Singleton @Named("main")
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(ApiConstants.BASE_URL)
@@ -45,9 +52,7 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    @Provides
-    @Singleton
-    @Named("mall")
+    @Provides @Singleton @Named("mall")
     fun provideMallRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl(ApiConstants.MALL_BASE_URL)
@@ -55,60 +60,26 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    // ---- Services ----
-
-    @Provides
-    @Singleton
-    fun provideAuthApiService(@Named("main") retrofit: Retrofit): AuthApiService =
-        retrofit.create(AuthApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMemberApiService(@Named("main") retrofit: Retrofit): MemberApiService =
-        retrofit.create(MemberApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun providePostsApiService(@Named("main") retrofit: Retrofit): PostsApiService =
-        retrofit.create(PostsApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideContentApiService(@Named("main") retrofit: Retrofit): ContentApiService =
-        retrofit.create(ContentApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideClubApiService(@Named("main") retrofit: Retrofit): ClubApiService =
-        retrofit.create(ClubApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideActivityApiService(@Named("main") retrofit: Retrofit): ActivityApiService =
-        retrofit.create(ActivityApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideDiscoverApiService(@Named("main") retrofit: Retrofit): DiscoverApiService =
-        retrofit.create(DiscoverApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideVehicleApiService(@Named("main") retrofit: Retrofit): VehicleApiService =
-        retrofit.create(VehicleApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMiscApiService(@Named("main") retrofit: Retrofit): MiscApiService =
-        retrofit.create(MiscApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideImApiService(@Named("main") retrofit: Retrofit): ImApiService =
-        retrofit.create(ImApiService::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMallApiService(@Named("mall") retrofit: Retrofit): MallApiService =
-        retrofit.create(MallApiService::class.java)
+    @Provides @Singleton
+    fun provideAuthApiService(@Named("main") r: Retrofit): AuthApiService = r.create(AuthApiService::class.java)
+    @Provides @Singleton
+    fun provideMemberApiService(@Named("main") r: Retrofit): MemberApiService = r.create(MemberApiService::class.java)
+    @Provides @Singleton
+    fun providePostsApiService(@Named("main") r: Retrofit): PostsApiService = r.create(PostsApiService::class.java)
+    @Provides @Singleton
+    fun provideContentApiService(@Named("main") r: Retrofit): ContentApiService = r.create(ContentApiService::class.java)
+    @Provides @Singleton
+    fun provideClubApiService(@Named("main") r: Retrofit): ClubApiService = r.create(ClubApiService::class.java)
+    @Provides @Singleton
+    fun provideActivityApiService(@Named("main") r: Retrofit): ActivityApiService = r.create(ActivityApiService::class.java)
+    @Provides @Singleton
+    fun provideDiscoverApiService(@Named("main") r: Retrofit): DiscoverApiService = r.create(DiscoverApiService::class.java)
+    @Provides @Singleton
+    fun provideVehicleApiService(@Named("main") r: Retrofit): VehicleApiService = r.create(VehicleApiService::class.java)
+    @Provides @Singleton
+    fun provideMiscApiService(@Named("main") r: Retrofit): MiscApiService = r.create(MiscApiService::class.java)
+    @Provides @Singleton
+    fun provideImApiService(@Named("main") r: Retrofit): ImApiService = r.create(ImApiService::class.java)
+    @Provides @Singleton
+    fun provideMallApiService(@Named("mall") r: Retrofit): MallApiService = r.create(MallApiService::class.java)
 }

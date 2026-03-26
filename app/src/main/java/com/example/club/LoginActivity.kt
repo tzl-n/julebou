@@ -1,16 +1,17 @@
 package com.example.club
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.example.club.databinding.ActivityLoginBinding
+import com.example.club.base.BaseActivity
+import com.example.club.base.BaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class LoginActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+/** LoginActivity 的占位 ViewModel */
+class LoginViewModel : BaseViewModel()
 
-        // 返回按钮
-        findViewById<android.widget.ImageView>(R.id.iv_back).setOnClickListener {
-            finish()
-        }
+@AndroidEntryPoint
+class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layout.activity_login) {
+
+    override fun initView() {
+        binding.ivBack.setOnClickListener { finish() }
     }
 }

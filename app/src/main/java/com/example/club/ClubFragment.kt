@@ -1,5 +1,6 @@
 package com.example.club
 
+<<<<<<< HEAD
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -9,10 +10,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+=======
+>>>>>>> lu
 import com.example.club.databinding.FragmentClubBinding
+import com.example.club.base.BaseFragment
+import com.example.club.base.BaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class ClubFragment : Fragment() {
+/** ClubFragment 占位 ViewModel */
+class ClubViewModel : BaseViewModel()
 
+<<<<<<< HEAD
     private var _binding: FragmentClubBinding? = null
     private val binding get() = _binding!!
     
@@ -81,6 +89,11 @@ class ClubFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+=======
+@AndroidEntryPoint
+class ClubFragment : BaseFragment<FragmentClubBinding, ClubViewModel>(R.layout.fragment_club) {
+    override fun initView() {}
+>>>>>>> lu
 }
 
 

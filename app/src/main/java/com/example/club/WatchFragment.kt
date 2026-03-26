@@ -1,28 +1,14 @@
 package com.example.club
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.example.club.databinding.FragmentWatchBinding
+import com.example.club.base.BaseFragment
+import com.example.club.base.BaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class WatchFragment : Fragment() {
+/** WatchFragment 占位 ViewModel */
+class WatchViewModel : BaseViewModel()
 
-    private var _binding: FragmentWatchBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentWatchBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+@AndroidEntryPoint
+class WatchFragment : BaseFragment<FragmentWatchBinding, WatchViewModel>(R.layout.fragment_watch) {
+    override fun initView() {}
 }
