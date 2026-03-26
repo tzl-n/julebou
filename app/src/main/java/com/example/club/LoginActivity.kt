@@ -8,7 +8,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // 返回按钮
+        // 返回按钮1
         findViewById<android.widget.ImageView>(R.id.iv_back).setOnClickListener {
             finish()
         }
