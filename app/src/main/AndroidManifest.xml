@@ -30,6 +30,11 @@
             android:name=".LoginActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".LocationPickerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Club">
+        </activity>
     </application>
 
 </manifest>
