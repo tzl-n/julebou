@@ -1,28 +1,14 @@
 package com.example.club
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.example.club.databinding.FragmentMessageBinding
+import com.example.club.base.BaseFragment
+import com.example.club.base.BaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class MessageFragment : Fragment() {
+/** MessageFragment 占位 ViewModel */
+class MessageViewModel : BaseViewModel()
 
-    private var _binding: FragmentMessageBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMessageBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+@AndroidEntryPoint
+class MessageFragment : BaseFragment<FragmentMessageBinding, MessageViewModel>(R.layout.fragment_message) {
+    override fun initView() {}
 }

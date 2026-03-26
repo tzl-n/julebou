@@ -17,24 +17,18 @@ import kotlinx.coroutines.launch
  * MVVM 基础 ViewModel
  *
  * 提供：
- * - [uiState]       UI 状态流（Loading / Success / Error）
- * - [toastEvent]    全局 Toast 事件流（单次消费）
- * - [launch]        协程启动 + 自动异常捕获
- * - [request]       一行代码完成网络请求 + 状态管理
+ * - [uiState]    UI 状态流（Idle / Loading / Success / Error）
+ * - [toastEvent] 全局 Toast 单次事件流
+ * - [launch]     协程启动 + 全局异常捕获
+ * - [request]    一行代码完成网络请求 + 状态管理
  */
 open class BaseViewModel : ViewModel() {
 
-    // ---- UI 状态 ----
-
     private val _uiState = MutableStateFlow<UiState>(UiState.Idle)
-    /** UI 加载状态（Idle / Loading / Success / Error） */
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val _toastEvent = MutableSharedFlow<String>()
-    /** 全局 Toast 事件（用 SharedFlow 保证单次消费） */
     val toastEvent: SharedFlow<String> = _toastEvent.asSharedFlow()
-
-    // ---- 状态控制 ----
 
     protected fun showLoading() { _uiState.value = UiState.Loading }
     protected fun showSuccess() { _uiState.value = UiState.Success }
@@ -48,12 +42,10 @@ open class BaseViewModel : ViewModel() {
         viewModelScope.launch { _toastEvent.emit(msg) }
     }
 
-    // ---- 协程启动 ----
-
     /**
      * 带全局异常捕获的协程启动
-     * @param showLoading 是否自动显示/隐藏 Loading 状态
-     * @param onError 自定义错误处理（不传则弹 Toast）
+     * @param showLoading 是否自动切换 Loading 状态
+     * @param onError     自定义错误处理（不传则弹 Toast）
      */
     protected fun launch(
         showLoading: Boolean = false,
@@ -67,8 +59,7 @@ open class BaseViewModel : ViewModel() {
                 if (showLoading) showSuccess()
             } catch (e: Exception) {
                 val msg = e.message ?: "未知错误"
-                if (onError != null) onError(msg)
-                else showError(msg)
+                if (onError != null) onError(msg) else showError(msg)
             }
         }
     }
@@ -76,11 +67,10 @@ open class BaseViewModel : ViewModel() {
     /**
      * 一行代码完成网络请求 + 状态管理
      *
-     * 用法：
+     * 示例：
      * ```kotlin
      * request(
-     *     showLoading = true,
-     *     call = { postsApiService.getPostsPage() },
+     *     call = { postsService.getPostsPage() },
      *     onSuccess = { page -> _posts.value = page }
      * )
      * ```
@@ -99,35 +89,27 @@ open class BaseViewModel : ViewModel() {
                     onSuccess(result.data)
                 }
                 is NetworkResult.Error -> {
-                    val msg = result.message
                     if (onError != null) {
                         showIdle()
-                        onError(msg)
+                        onError(result.message)
                     } else {
-                        showError(msg)
+                        showError(result.message)
                     }
                 }
-                is NetworkResult.Loading -> { /* 不会走到这里 */ }
+                is NetworkResult.Loading -> Unit
             }
         }
     }
 
-    /** 网络错误/业务错误回调，子类按需重写 */
     open fun onError(throwable: Throwable) {
         throwable.printStackTrace()
     }
 }
 
-/**
- * UI 状态密封类
- */
+/** UI 状态密封类 */
 sealed class UiState {
-    /** 初始/空闲状态 */
-    object Idle : UiState()
-    /** 加载中 */
+    object Idle    : UiState()
     object Loading : UiState()
-    /** 加载成功 */
     object Success : UiState()
-    /** 加载失败 */
     data class Error(val message: String) : UiState()
 }

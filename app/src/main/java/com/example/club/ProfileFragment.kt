@@ -1,25 +1,21 @@
 package com.example.club
 
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import android.widget.TextView
+import com.example.club.base.BaseFragment
+import com.example.club.base.BaseViewModel
+import com.example.club.databinding.FragmentProfileBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-class ProfileFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_profile, container, false)
-        
-        // 点击"点击登录"跳转到登录页
-        view.findViewById<android.widget.TextView>(R.id.login).setOnClickListener {
+/** ProfileFragment 占位 ViewModel */
+class ProfileViewModel : BaseViewModel()
+
+@AndroidEntryPoint
+class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R.layout.fragment_profile) {
+    override fun initView() {
+        // profile_header 作为 include，login 在 include 内部，需通过根视图查找
+        binding.root.findViewById<TextView>(R.id.login)?.setOnClickListener {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
         }
-        
-        return view
     }
 }

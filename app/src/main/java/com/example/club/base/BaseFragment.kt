@@ -16,31 +16,22 @@ import java.lang.reflect.ParameterizedType
 
 /**
  * MVVM 基础 Fragment
- *
- * 自动完成：
- * - DataBinding 绑定（安全 _binding 模式，onDestroyView 自动置 null）
- * - ViewModel 实例化（反射，Hilt 注入用 by viewModels() 覆盖）
- * - 观察 [UiState] 和 [toastEvent]
- *
- * 使用：
- * ```kotlin
- * @AndroidEntryPoint
- * class ClubFragment : BaseFragment<FragmentClubBinding, ClubViewModel>(R.layout.fragment_club) {
- *     override fun initView() { binding.vm = viewModel }
- * }
- * ```
+ * - DataBinding 安全绑定（onDestroyView 自动置 null）
+ * - ViewModel 自动实例化（Hilt 注入时用 by viewModels() 覆盖）
+ * - 自动观察 UiState 控制 LoadingDialog
+ * - 自动观察 toastEvent 弹 Toast
  */
 abstract class BaseFragment<VB : ViewDataBinding, VM : BaseViewModel>(
     private val layoutId: Int
 ) : Fragment() {
 
     private var _binding: VB? = null
-
-    /** 安全访问 binding（仅在 onCreateView ~ onDestroyView 之间有效） */
     val binding: VB get() = _binding!!
 
     lateinit var viewModel: VM
         private set
+
+    private var loadingDialog: LoadingDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +45,7 @@ abstract class BaseFragment<VB : ViewDataBinding, VM : BaseViewModel>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadingDialog = LoadingDialog(requireContext())
         viewModel = createViewModel()
         observeBase()
         initView()
@@ -67,35 +59,33 @@ abstract class BaseFragment<VB : ViewDataBinding, VM : BaseViewModel>(
         return ViewModelProvider(this)[type]
     }
 
-    /** 观察基础 UiState 和 Toast 事件 */
     private fun observeBase() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
                 when (state) {
                     is UiState.Loading -> onShowLoading()
                     is UiState.Success -> onHideLoading()
-                    is UiState.Error   -> {
-                        onHideLoading()
-                        onShowError(state.message)
-                    }
+                    is UiState.Error   -> { onHideLoading(); onShowError(state.message) }
                     is UiState.Idle    -> onHideLoading()
                 }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.toastEvent.collectLatest { msg ->
-                showToast(msg)
-            }
+            viewModel.toastEvent.collectLatest { msg -> showToast(msg) }
         }
     }
 
-    /** 显示 Loading（子类可覆盖替换为自定义弹窗） */
-    open fun onShowLoading() {}
+    /** 显示 Loading 弹窗（子类可覆盖） */
+    open fun onShowLoading(message: String = "加载中...") {
+        loadingDialog?.show(message)
+    }
 
-    /** 隐藏 Loading */
-    open fun onHideLoading() {}
+    /** 隐藏 Loading 弹窗 */
+    open fun onHideLoading() {
+        loadingDialog?.safeDismiss()
+    }
 
-    /** 显示错误（默认弹 Toast） */
+    /** 显示错误提示（默认弹 Toast） */
     open fun onShowError(message: String) {
         showToast(message)
     }
@@ -105,14 +95,16 @@ abstract class BaseFragment<VB : ViewDataBinding, VM : BaseViewModel>(
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 
-    /** 初始化视图、绑定点击事件等 */
+    /** 初始化视图（子类必须实现） */
     abstract fun initView()
 
-    /** 观察业务 LiveData / StateFlow */
+    /** 观察业务数据（子类按需实现） */
     open fun observeData() {}
 
     override fun onDestroyView() {
         super.onDestroyView()
+        loadingDialog?.safeDismiss()
+        loadingDialog = null
         _binding = null
     }
 }

@@ -8,19 +8,22 @@ import javax.inject.Inject
 
 /**
  * 请求头拦截器
+ *
  * 自动为每个请求注入公共 Header：
- *   - Authorization（Bearer Token）
- *   - platform、source、version、Content-Language
+ * - Authorization: Bearer {accessToken}（已登录时才注入）
+ * - Content-Language: zh_CN
+ * - platform: ANDROID
+ * - source: CLUB_APP
+ * - version: 当前 App 版本号
  */
 class HttpHeaderInterceptor @Inject constructor(
     private val tokenManager: TokenManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val original = chain.request()
-        val builder = original.newBuilder()
+        val builder = chain.request().newBuilder()
 
-        // 注入 Token（非空时才加）
+        // 已登录时才注入 Token
         if (tokenManager.isLoggedIn) {
             builder.header("Authorization", "Bearer ${tokenManager.accessToken}")
         }
@@ -31,7 +34,6 @@ class HttpHeaderInterceptor @Inject constructor(
             .header("platform", "ANDROID")
             .header("source", "CLUB_APP")
             .header("version", BuildConfig.VERSION_NAME)
-
         return chain.proceed(builder.build())
     }
 }

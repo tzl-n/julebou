@@ -13,20 +13,10 @@ import java.lang.reflect.ParameterizedType
 
 /**
  * MVVM 基础 Activity
- *
- * 自动完成：
- * - DataBinding 绑定
- * - ViewModel 实例化（反射，Hilt 注入用 by viewModels() 覆盖）
- * - 观察 [UiState]（Loading / Success / Error）
- * - 观察 [toastEvent] 自动弹 Toast
- *
- * 使用：
- * ```kotlin
- * @AndroidEntryPoint
- * class HomeActivity : BaseActivity<ActivityHomeBinding, HomeViewModel>(R.layout.activity_home) {
- *     override fun initView() { binding.vm = viewModel }
- * }
- * ```
+ * - DataBinding 自动绑定
+ * - ViewModel 自动实例化（Hilt 注入时用 by viewModels() 覆盖）
+ * - 自动观察 UiState 控制 LoadingDialog
+ * - 自动观察 toastEvent 弹 Toast
  */
 abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(
     private val layoutId: Int
@@ -37,6 +27,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(
 
     lateinit var viewModel: VM
         private set
+
+    private val loadingDialog by lazy { LoadingDialog(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,35 +47,33 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(
         return ViewModelProvider(this)[type]
     }
 
-    /** 观察基础 UiState 和 Toast 事件 */
     private fun observeBase() {
         lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
                 when (state) {
                     is UiState.Loading -> onShowLoading()
                     is UiState.Success -> onHideLoading()
-                    is UiState.Error   -> {
-                        onHideLoading()
-                        onShowError(state.message)
-                    }
+                    is UiState.Error   -> { onHideLoading(); onShowError(state.message) }
                     is UiState.Idle    -> onHideLoading()
                 }
             }
         }
         lifecycleScope.launch {
-            viewModel.toastEvent.collectLatest { msg ->
-                showToast(msg)
-            }
+            viewModel.toastEvent.collectLatest { msg -> showToast(msg) }
         }
     }
 
-    /** 显示 Loading（子类可覆盖替换为自定义 Loading 弹窗） */
-    open fun onShowLoading() {}
+    /** 显示 Loading 弹窗（子类可覆盖换自定义弹窗） */
+    open fun onShowLoading(message: String = "加载中...") {
+        loadingDialog.show(message)
+    }
 
-    /** 隐藏 Loading */
-    open fun onHideLoading() {}
+    /** 隐藏 Loading 弹窗 */
+    open fun onHideLoading() {
+        loadingDialog.safeDismiss()
+    }
 
-    /** 显示错误（默认弹 Toast，子类可覆盖） */
+    /** 显示错误提示（默认弹 Toast，子类可覆盖） */
     open fun onShowError(message: String) {
         showToast(message)
     }
@@ -93,9 +83,14 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
-    /** 初始化视图、绑定点击事件等 */
+    /** 初始化视图、绑定点击等（子类必须实现） */
     abstract fun initView()
 
-    /** 观察业务 LiveData / StateFlow（子类按需实现） */
+    /** 观察业务数据（子类按需实现） */
     open fun observeData() {}
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadingDialog.safeDismiss()
+    }
 }

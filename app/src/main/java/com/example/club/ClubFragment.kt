@@ -1,28 +1,14 @@
 package com.example.club
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.example.club.databinding.FragmentClubBinding
+import com.example.club.base.BaseFragment
+import com.example.club.base.BaseViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class ClubFragment : Fragment() {
+/** ClubFragment 占位 ViewModel */
+class ClubViewModel : BaseViewModel()
 
-    private var _binding: FragmentClubBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentClubBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+@AndroidEntryPoint
+class ClubFragment : BaseFragment<FragmentClubBinding, ClubViewModel>(R.layout.fragment_club) {
+    override fun initView() {}
 }
