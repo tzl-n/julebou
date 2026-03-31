@@ -3,10 +3,11 @@ package com.example.club.network.model
 /** 统一响应基类 */
 data class BaseModel<T>(
     val code: Int = 0,
-    val msg: String = "",
+    val msg: String? = null,  // 改为可空类型，适配服务端返回 null 的情况
     val data: T? = null
 ) {
-    val isSuccess: Boolean get() = code == 200
+    // 服务端返回 code=0 表示成功（而不是 200）
+    val isSuccess: Boolean get() = code == 0 || code == 200
 }
 
 /** 统一分页基类 */

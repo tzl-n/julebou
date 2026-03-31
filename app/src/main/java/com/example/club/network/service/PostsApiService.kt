@@ -3,6 +3,7 @@ package com.example.club.network.service
 import com.example.club.network.api.ApiConstants
 import com.example.club.network.model.BaseModel
 import com.example.club.network.model.BasePageModel
+import com.example.club.network.model.PostsModel
 import retrofit2.http.*
 
 /**
@@ -29,7 +30,7 @@ interface PostsApiService {
         @Query("ifFocus") ifFocus: Boolean? = null,
         @Query("pageNum") pageNum: Int = 1,
         @Query("pageSize") pageSize: Int = 10
-    ): BaseModel<BasePageModel<Any>>
+    ): BaseModel<BasePageModel<PostsModel>>
 
     /** 获取帖子详情
      * @param postsId 帖子ID

@@ -43,12 +43,21 @@ android {
 }
 
 dependencies {
-    // AndroidX Core
+    // AndroidX Core - 必须放在最前面
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    
+    // Material
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    
+    // RecyclerView & SwipeRefreshLayout
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    
+    // CardView
+    implementation("androidx.cardview:cardview:1.0.0")
 
     // Hilt
     implementation(libs.hilt.android)
@@ -67,6 +76,9 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    
+    // Coil - 图片加载
+    implementation("io.coil-kt:coil:2.6.0")
 
     // Test
     testImplementation(libs.junit)

@@ -47,7 +47,7 @@ suspend fun <T> apiCall(
                     cause = AuthException()
                 )
                 else -> NetworkResult.Error(
-                    message = response.msg.ifBlank { "请求失败(${response.code})" },
+                    message = response.msg?.ifBlank { "请求失败 (${response.code})" } ?: "请求失败 (${response.code})",
                     code = response.code
                 )
             }
