@@ -1,15 +1,69 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+# ==========================================
+# 1. 编译生成的构建产物（必须忽略）
+# ==========================================
+# 根目录 build（如果有）
 /build
-/captures
-.externalNativeBuild
-.cxx
+# 所有子模块的 build 目录（比如 app/build、feature/build）
+*/build
+# 捕获的截图、录屏等
+captures/
+# 构建输出的 JSON 报告
+output.json
+# 发布包目录
+*/release/
+*/debug/
+
+# ==========================================
+# 2. Android Studio / IDEA 配置文件（必须忽略）
+# ==========================================
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_backup/
+# 本地 SDK 路径配置（每个人电脑不同）
 local.properties
+# macOS 系统文件
+.DS_Store
+# Windows 系统文件
+Thumbs.db
+
+# ==========================================
+# 3. Gradle 相关缓存与配置
+# ==========================================
+.gradle/
+gradle-app.setting
+# 保留 gradle-wrapper.jar（必须保留，不能忽略）
+!gradle/wrapper/gradle-wrapper.jar
+# 本地 Gradle 用户配置
+.gradle/
+
+# ==========================================
+# 4. 原生构建 / NDK 相关
+# ==========================================
+.externalNativeBuild/
+.cxx/
+*/.cxx/
+
+# ==========================================
+# 5. 签名、密钥等敏感文件（绝对不能提交）
+# ==========================================
+*.keystore
+*.jks
+*.p12
+*.pem
+signing/
+key.properties
+
+# ==========================================
+# 6. 日志、临时文件、缓存
+# ==========================================
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+*.lock
+# 本地测试报告
+*/build/reports/
+*/build/outputs/
