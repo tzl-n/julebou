@@ -45,7 +45,6 @@ interface ClubApiService {
     /** 分页获取俱乐部评分/评价列表
      * @param clubId 俱乐部ID
      */
-    @POST(ClubApiConstants.Club.EVALUATION_LIST)
     suspend fun getEvaluationList(
         @Query("clubId") clubId: String,
         @Query("pageNum") pageNum: Int = 1,
